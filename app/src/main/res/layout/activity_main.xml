@@ -5,5 +5,83 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/back"
-    tools:context=".MainActivity"/>
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="139dp" />
+
+    <ImageView
+        android:id="@+id/dice1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="@string/_1"
+        app:srcCompat="@drawable/dice1"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="105dp"
+        tools:layout_editor_absoluteY="247dp" />
+
+    <ImageView
+        android:id="@+id/dice2"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="@string/_2"
+        app:srcCompat="@drawable/dice2"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="105dp"
+        tools:layout_editor_absoluteY="347dp" />
+
+    <ImageView
+        android:id="@+id/dice4"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="@string/_4"
+        app:srcCompat="@drawable/dice3"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="205dp"
+        tools:layout_editor_absoluteY="247dp" />
+
+    <ImageView
+        android:id="@+id/dice5"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="@string/_5"
+        app:srcCompat="@drawable/dice4"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="205dp"
+        tools:layout_editor_absoluteY="347dp" />
+
+    <ImageView
+        android:id="@+id/dice3"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="@string/_3"
+        app:srcCompat="@drawable/dice5"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="105dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <ImageView
+        android:id="@+id/dice6"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="@string/_6"
+        app:srcCompat="@drawable/dice6"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="205dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <Button
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/roll"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="161dp"
+        tools:layout_editor_absoluteY="622dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 

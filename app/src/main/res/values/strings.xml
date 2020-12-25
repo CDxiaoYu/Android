@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">唐劼宇2018110534</string>
+    <string name="_1">色子1</string>
+    <string name="_2">色子2</string>
+    <string name="_4">色子4</string>
+    <string name="_5">色子5</string>
+    <string name="_3">色子3</string>
+    <string name="_6">色子6</string>
+    <string name="roll">Roll</string>
 </resources>
