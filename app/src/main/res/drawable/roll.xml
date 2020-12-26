@@ -21,11 +21,6 @@
     <item android:drawable="@drawable/box1" android:duration="100" />
     <item android:drawable="@drawable/box0" android:duration="100" />
     <item android:drawable="@drawable/box1" android:duration="100" />
-    <item android:drawable="@drawable/box2" android:duration="100" />
-    <item android:drawable="@drawable/box3" android:duration="100" />
-    <item android:drawable="@drawable/box2" android:duration="100" />
-    <item android:drawable="@drawable/box1" android:duration="100" />
-    <item android:drawable="@drawable/box0" android:duration="100" />
     <item android:drawable="@drawable/box1" android:duration="100" />
 
 

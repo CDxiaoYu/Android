@@ -2,18 +2,25 @@ package com.yuanfen.myapplication
 
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
 import android.media.Image
+import android.media.SoundPool
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import java.security.AccessController.getContext
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        var open: Button = findViewById(R.id.open)
+        var instance = SoundPoolUtil.getInstance(this)
 
         //初始化色盅摇动功能
         var box: ImageView = findViewById(R.id.box)
@@ -28,28 +35,45 @@ class MainActivity : AppCompatActivity() {
 
         //点击roll事件
         rollButton.setOnClickListener{
+
+            rollButton.setClickable(false)
+            open.setClickable(false)
+            box.setVisibility(View.VISIBLE);
             //进入生成随机功能
+
             rollDice();
+            if (instance != null) {
+                instance.play(1)
+
+            };
             //摇动色子
             animaition.start();
             //延迟使色子停止
             var handler = Handler();
-            handler.postDelayed({animaition.stop()},2500)
+            handler.postDelayed({
+                animaition.stop()
+                rollButton.setClickable(true)
+                open.setClickable(true)
+                                },1900)
+
+
         }
-        var open: Button = findViewById(R.id.open)
+
 
         open.setOnClickListener{
             if (box.isShown()) {
                 box.setVisibility(View.INVISIBLE);
-                open.setText("show");
+                open.setText("开");
             } else {
                 box.setVisibility(View.VISIBLE);
-                open.setText("fade");
+                open.setText("关");
             }
         }
 
         rollDice()
     }
+
+
 
     private fun rollDice(){
         var array = IntArray(6);
