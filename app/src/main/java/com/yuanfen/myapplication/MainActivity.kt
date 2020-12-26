@@ -1,7 +1,12 @@
 package com.yuanfen.myapplication
 
+import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.Drawable
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 
@@ -10,11 +15,39 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //初始化色盅摇动功能
+        var box: ImageView = findViewById(R.id.box)
+        box.setBackgroundResource(R.drawable.roll)
+        var animaition : AnimationDrawable = box.getBackground() as AnimationDrawable;
+
+        //使初始有background
+        animaition.start();
+        animaition.stop();
+
         var rollButton: Button = findViewById(R.id.roll)
 
+        //点击roll事件
         rollButton.setOnClickListener{
-            rollDice()
+            //进入生成随机功能
+            rollDice();
+            //摇动色子
+            animaition.start();
+            //延迟使色子停止
+            var handler = Handler();
+            handler.postDelayed({animaition.stop()},2500)
         }
+        var open: Button = findViewById(R.id.open)
+
+        open.setOnClickListener{
+            if (box.isShown()) {
+                box.setVisibility(View.INVISIBLE);
+                open.setText("show");
+            } else {
+                box.setVisibility(View.VISIBLE);
+                open.setText("fade");
+            }
+        }
+
         rollDice()
     }
 
@@ -35,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         change(diceImage4,array[3]);
         change(diceImage5,array[4]);
         change(diceImage6,array[5]);
-
     }
 
     private fun change(imageView: ImageView,int: Int){
@@ -50,3 +82,5 @@ class MainActivity : AppCompatActivity() {
         imageView.setImageResource(drawableResource)
     }
 }
+
+
