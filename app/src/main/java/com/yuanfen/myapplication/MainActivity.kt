@@ -1,17 +1,14 @@
 package com.yuanfen.myapplication
 
 import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.Drawable
-import android.media.AudioManager
-import android.media.Image
-import android.media.SoundPool
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import java.security.AccessController.getContext
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,25 +33,26 @@ class MainActivity : AppCompatActivity() {
         //点击roll事件
         rollButton.setOnClickListener{
 
-            rollButton.setClickable(false)
-            open.setClickable(false)
-            box.setVisibility(View.VISIBLE);
-            //进入生成随机功能
-
-            rollDice();
-            if (instance != null) {
-                instance.play(1)
-
-            };
-            //摇动色子
-            animaition.start();
-            //延迟使色子停止
-            var handler = Handler();
-            handler.postDelayed({
-                animaition.stop()
-                rollButton.setClickable(true)
-                open.setClickable(true)
-                                },1900)
+            roll();
+//            rollButton.setClickable(false)
+//            open.setClickable(false)
+//            box.setVisibility(View.VISIBLE);
+//            //进入生成随机功能
+//
+//            rollDice();
+//            if (instance != null) {
+//                instance.play(1)
+//
+//            };
+//            //摇动色子
+//            animaition.start();
+//            //延迟使色子停止
+//            var handler = Handler();
+//            handler.postDelayed({
+//                animaition.stop()
+//                rollButton.setClickable(true)
+//                open.setClickable(true)
+//                                },1900)
 
 
         }
@@ -63,15 +61,21 @@ class MainActivity : AppCompatActivity() {
         open.setOnClickListener{
             if (box.isShown()) {
                 box.setVisibility(View.INVISIBLE);
-                open.setText("开");
+                open.setText("关");
             } else {
                 box.setVisibility(View.VISIBLE);
-                open.setText("关");
+                open.setText("开");
             }
         }
 
+
+
+        var shakeinterface :   ShakeInterface
+
+
         rollDice()
     }
+
 
 
 
@@ -105,6 +109,44 @@ class MainActivity : AppCompatActivity() {
         }
         imageView.setImageResource(drawableResource)
     }
+
+
+    class ShakeInterface : com.yuanfen.myapplication.ShakeInterface.OnShakeListener {
+        override fun onShake() {
+
+        }
+    }
+
+    private fun roll(){
+        var rollButton: Button = findViewById(R.id.roll)
+        var open: Button = findViewById(R.id.open)
+        var box: ImageView = findViewById(R.id.box)
+        var instance = SoundPoolUtil.getInstance(this)
+        var animaition : AnimationDrawable = box.getBackground() as AnimationDrawable;
+
+        rollButton.setClickable(false)
+        open.setClickable(false)
+        box.setVisibility(View.VISIBLE);
+        //进入生成随机功能
+
+        rollDice();
+        if (instance != null) {
+            instance.play(1)
+
+        };
+        //摇动色子
+        animaition.start();
+        //延迟使色子停止
+        var handler = Handler();
+        handler.postDelayed({
+            animaition.stop()
+            rollButton.setClickable(true)
+            open.setClickable(true)
+        },1900)
+
+    }
+
+
 }
 
 
