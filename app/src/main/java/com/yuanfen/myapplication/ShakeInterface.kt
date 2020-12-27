@@ -5,150 +5,100 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.FloatMath
-import java.lang.Math.sqrt
-import kotlin.math.sqrt
 
 
-class ShakeInterface(context: Context) : SensorEventListener {
-    //检测摇动相关变量
-    private var initTime: Long = 0
-    private var lastTime: Long = 0
-    private var curTime: Long = 0
-    private var duration: Long = 0
+class SensorManagerHelper(private val context: Context) : SensorEventListener {
+    // 速度阈值，当摇晃速度达到这值后产生作用
+    private val SPEED_SHRESHOLD = 5000
+    // 两次检测的时间间隔
+    private val UPTATE_INTERVAL_TIME = 50
+    // 传感器管理器
+    private var sensorManager: SensorManager? = null
+    // 传感器
+    private var sensor: Sensor? = null
+    // 重力感应监听器
+    private var onShakeListener: OnShakeListener? = null
+    // 手机上一个位置时重力感应坐标
+    private var lastX: Float = 0.toFloat()
+    private var lastY: Float = 0.toFloat()
+    private var lastZ: Float = 0.toFloat()
+    // 上次检测时间
+    private var lastUpdateTime: Long = 0
 
-    /**
-     * 上次检测时，各分量
-     */
-    private var last_x = 0.0f
-    private var last_y = 0.0f
-    private var last_z = 0.0f
-
-    /**
-     * 本次晃动值
-     */
-    private var shake = 0.0f
-
-    /**
-     * 控制时间间隔
-     */
-    var timeInterval = 100
+    init {
+        start()
+    }
 
     /**
-     * 晃动阀值
+     * 开始检测
      */
-    var shakeThreshold = 3000
-    var isRecoding = false
-    private val mSensorManager: SensorManager?
-    private val mListeners: ArrayList<OnShakeListener>
+    fun start() {
+        // 获得传感器管理器
+        sensorManager = context
+            .getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        if (sensorManager != null) {
+            // 获得重力传感器
+            sensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        }
+        // 注册
+        if (sensor != null) {
+            sensorManager!!.registerListener(
+                this, sensor,
+                SensorManager.SENSOR_DELAY_GAME
+            )
+        }
+    }
 
     /**
-     * 定义摇晃发生时的事件处理接口，需实现onShake方法
+     * 停止检测
      */
+    fun stop() {
+        sensorManager!!.unregisterListener(this)
+    }
+
+    // 摇晃监听接口
     interface OnShakeListener {
-        /**
-         * 当手机摇晃时被调用
-         */
         fun onShake()
     }
 
-    /**
-     * 注册OnShakeListener，当摇晃时接收通知
-     *
-     * @param listener
-     */
-    fun registerOnShakeListener(listener: OnShakeListener) {
-        if (mListeners.contains(listener)) return
-        mListeners.add(listener)
+    // 设置重力感应监听器
+    fun setOnShakeListener(listener: OnShakeListener) {
+        onShakeListener = listener
     }
 
     /**
-     * 移除已经注册的OnShakeListener
-     *
-     * @param listener
+     * 重力感应器感应获得变化数据
+     * android.hardware.SensorEventListener#onSensorChanged(android.hardware
+     * .SensorEvent)
      */
-    fun unregisterOnShakeListener(listener: OnShakeListener) {
-        mListeners.remove(listener)
-    }
-
-    /**
-     * 启动摇晃检测
-     */
-    fun start() {
-        if (mSensorManager == null) {
-            throw UnsupportedOperationException()
-        }
-        val sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-            ?: throw UnsupportedOperationException()
-        val success = mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME)
-        if (!success) {
-            throw UnsupportedOperationException()
-        } else {
-            println("注册成功")
-        }
-    }
-
-    /**
-     * 停止摇晃检测
-     */
-    fun stop() {
-        mSensorManager?.unregisterListener(this)
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        //什么也不干
-        println("精度发生变化")
-    }
-
-    //传感器数据变动事件
     override fun onSensorChanged(event: SensorEvent) {
-
-        //如果没有开始录音的话可以监听是否有摇动事件，如果有摇动事件可以开始录音
-        //获取加速度传感器的三个参数
-        val x = event.values[SensorManager.DATA_X]
-        val y = event.values[SensorManager.DATA_Y]
-        val z = event.values[SensorManager.DATA_Z]
-        //获取当前时刻的毫秒数
-        curTime = System.currentTimeMillis()
-        if (!isRecoding) {
-            //100毫秒检测一次
-            //System.out.println("开始变化,curtime:" + curTime +"lasttime:" + lastTime);
-            if (curTime - lastTime > timeInterval) {
-                duration = curTime - lastTime
-                // 看是不是刚开始晃动
-                if (last_x == 0.0f && last_y == 0.0f && last_z == 0.0f) {
-                    //last_x、last_y、last_z同时为0时，表示刚刚开始记录
-                    initTime = System.currentTimeMillis()
-                } else {
-                    //精确算法，各方向差值平方和开平方,单次晃动幅度
-                    shake = sqrt((x - last_x) * (x - last_x) + (y - last_y) * (y - last_y) + (z - last_z) * (z - last_z)) / duration * 10000
-                }
-                println(shake)
-                if (shake >= shakeThreshold) {
-                    //此处开始执行
-                    notifyListeners()
-                }
-                last_x = x
-                last_y = y
-                last_z = z
-                lastTime = curTime
-            }
+        // 现在检测时间
+        val currentUpdateTime = System.currentTimeMillis()
+        // 两次检测的时间间隔
+        val timeInterval = currentUpdateTime - lastUpdateTime
+        // 判断是否达到了检测时间间隔
+        if (timeInterval < UPTATE_INTERVAL_TIME) return
+        // 现在的时间变成last时间
+        lastUpdateTime = currentUpdateTime
+        // 获得x,y,z坐标
+        val x = event.values[0]
+        val y = event.values[1]
+        val z = event.values[2]
+        // 获得x,y,z的变化值
+        val deltaX = x - lastX
+        val deltaY = y - lastY
+        val deltaZ = z - lastZ
+        // 将现在的坐标变成last坐标
+        lastX = x
+        lastY = y
+        lastZ = z
+        val speed = Math.sqrt((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ).toDouble()) / timeInterval * 10000
+        // 达到速度阀值，发出提示
+        if (speed >= SPEED_SHRESHOLD) {
+            onShakeListener!!.onShake()
         }
     }
 
-    /**
-     * 当摇晃事件发生时，通知所有的listener
-     */
-    private fun notifyListeners() {
-        for (listener in mListeners) {
-            println("你执行了？")
-            isRecoding = true
-            listener.onShake()
-        }
-    }
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 
-    init {
-        mSensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
-        mListeners = ArrayList()
-    }
 }

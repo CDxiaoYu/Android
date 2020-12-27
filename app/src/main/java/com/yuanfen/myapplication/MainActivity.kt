@@ -8,6 +8,7 @@ import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,32 +33,10 @@ class MainActivity : AppCompatActivity() {
 
         //点击roll事件
         rollButton.setOnClickListener{
-
             roll();
-//            rollButton.setClickable(false)
-//            open.setClickable(false)
-//            box.setVisibility(View.VISIBLE);
-//            //进入生成随机功能
-//
-//            rollDice();
-//            if (instance != null) {
-//                instance.play(1)
-//
-//            };
-//            //摇动色子
-//            animaition.start();
-//            //延迟使色子停止
-//            var handler = Handler();
-//            handler.postDelayed({
-//                animaition.stop()
-//                rollButton.setClickable(true)
-//                open.setClickable(true)
-//                                },1900)
-
-
         }
 
-
+        //开关按钮
         open.setOnClickListener{
             if (box.isShown()) {
                 box.setVisibility(View.INVISIBLE);
@@ -68,10 +47,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
-        var shakeinterface :   ShakeInterface
-
+        var sensorHelper  = SensorManagerHelper(this)
+        sensorHelper.setOnShakeListener(object : SensorManagerHelper.OnShakeListener {
+            override fun onShake() {
+                roll()
+            }
+        })
 
         rollDice()
     }
@@ -108,13 +89,6 @@ class MainActivity : AppCompatActivity() {
             else -> R.drawable.dice6
         }
         imageView.setImageResource(drawableResource)
-    }
-
-
-    class ShakeInterface : com.yuanfen.myapplication.ShakeInterface.OnShakeListener {
-        override fun onShake() {
-
-        }
     }
 
     private fun roll(){
